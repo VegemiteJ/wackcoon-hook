@@ -1,3 +1,6 @@
+# Custom update
+.vscode
+
 # Logs
 logs
 *.log

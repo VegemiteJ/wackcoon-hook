@@ -6,6 +6,7 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "compression": "^1.6.2",
+    "config": "^3.3.1",
     "express": "^4.13.4",
     "node-local-tunnel": "^0.1.5",
     "q": "^1.4.1"

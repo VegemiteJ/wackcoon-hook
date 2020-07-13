@@ -89,5 +89,5 @@ function execCallback(err, stdout, stderr) {
     }
 }
 
-// Start on default path + port 5000
-app.listen(5000, '0.0.0.0');
+// Start on default path + port
+app.listen(config.get('port'), '0.0.0.0');

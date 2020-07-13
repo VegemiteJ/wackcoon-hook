@@ -1,4 +1,5 @@
 {
+    "port": "defaultPort",
     "projectName": "Some ProjectName like 'GithubName/GithubRepo'",
     "projectPath": "Some local path like /home/user/Projects/GithubRepo"
 }

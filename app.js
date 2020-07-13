@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 var config = require('config');
 
 // Timing
+
 function getDateTime() {
     var now = new Date();
     var year = now.getFullYear();
@@ -34,6 +35,7 @@ function getDateTime() {
 }
 
 
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -57,7 +59,7 @@ app.post('/payload', function (req, res) {
     console.log(`[${getDateTime()}] ProjectName ${projectName} at path ${projectPath}`);
     // Verify this is an update for the right repo
     if (req.body.repository.full_name !== projectName) {
-        console.log(`[${getDateTime()}] Rejecting request - repository name does not match config`)
+        //console.log(`[${getDateTime()}] Rejecting request - repository name does not match config`)
         res.sendStatus(400);
         return;
     };
@@ -80,14 +82,15 @@ app.post('/payload', function (req, res) {
 
 function execCallback(err, stdout, stderr) {
     if (stdout) {
-        process.stdout.write(`[${getDateTime()}] `);
         console.log(stdout);
     }
     if (stderr) {
-        process.stdout.write(`[${getDateTime()}] `);
         console.log(stderr);
     }
 }
 
 // Start on default path + port
-app.listen(config.get('port'), '0.0.0.0');
+var port = config.get('port');
+app.listen(port, '0.0.0.0', () => {
+    console.log(`[${getDateTime()}] Started on port: ${port}`)
+});

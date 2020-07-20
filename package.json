@@ -8,6 +8,7 @@
     "compression": "^1.6.2",
     "config": "^3.3.1",
     "express": "^4.13.4",
+    "node-cron": "^2.0.3",
     "node-local-tunnel": "^0.1.5",
     "q": "^1.4.1"
   },

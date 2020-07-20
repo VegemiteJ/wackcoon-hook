@@ -2,6 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var exec = require('child_process').exec;
+// Node cron backup schedule
+var cron = require('node-cron');
 // Read config
 var config = require('config');
 
@@ -34,6 +36,33 @@ function getDateTime() {
     return dateTime;
 }
 
+// Logging from console commands
+function execCallback(err, stdout, stderr) {
+    if (stdout) {
+        console.log(stdout);
+    }
+    if (stderr) {
+        console.log(stderr);
+    }
+}
+
+// Logic to update repo
+function updateRepo(projectPath)
+{
+    console.log(`[${getDateTime()}] Pulling code from GitHub...`);
+    // reset any changes that have been made locally
+    exec('git -C ' + projectPath + ' reset --hard', execCallback);
+
+    // and ditch any files that have been added locally too
+    exec('git -C ' + projectPath + ' clean -xdf', execCallback);
+
+    // ensure on master branch
+    exec('git -C ' + projectPath + ' checkout master', execCallback);
+
+    // now pull down the latest
+    exec('git -C ' + projectPath + ' pull -f', execCallback);
+    console.log(`[${getDateTime()}] Request complete`);
+}
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -64,33 +93,19 @@ app.post('/payload', function (req, res) {
         return;
     };
 
-    console.log(`[${getDateTime()}] Pulling code from GitHub...`);
-    // reset any changes that have been made locally
-    exec('git -C ' + projectPath + ' reset --hard', execCallback);
-
-    // and ditch any files that have been added locally too
-    exec('git -C ' + projectPath + ' clean -xdf', execCallback);
-
-    // ensure on master branch
-    exec('git -C ' + projectPath + ' checkout master', execCallback);
-
-    // now pull down the latest
-    exec('git -C ' + projectPath + ' pull -f', execCallback);
-    console.log(`[${getDateTime()}] Request complete`);
+    updateRepo(projectPath);
     res.sendStatus(200);
 });
-
-function execCallback(err, stdout, stderr) {
-    if (stdout) {
-        console.log(stdout);
-    }
-    if (stderr) {
-        console.log(stderr);
-    }
-}
 
 // Start on default path + port
 var port = config.get('port');
 app.listen(port, '0.0.0.0', () => {
     console.log(`[${getDateTime()}] Started on port: ${port}`)
 });
+
+// Setup node cron backup schedule
+var cronJob = cron.schedule("*/5 * * * *", function(){
+    const projectPath = config.get('projectPath');
+    updateRepo(projectPath);
+});
+cronJob.start();

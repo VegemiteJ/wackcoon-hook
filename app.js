@@ -85,7 +85,7 @@ app.post('/payload', function (req, res) {
     //  Read on every call so the server doesn't need to restart on config updates
     const projectName = config.get('projectName');
     const projectPath = config.get('projectPath');
-    console.log(`[${getDateTime()}] ProjectName ${projectName} at path ${projectPath}`);
+    console.log(`[${getDateTime()}] Hook updating ${projectName} at path ${projectPath}`);
     // Verify this is an update for the right repo
     if (req.body.repository.full_name !== projectName) {
         console.log(`[${getDateTime()}] Rejecting request - repository name does not match config`)

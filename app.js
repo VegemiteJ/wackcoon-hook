@@ -105,7 +105,9 @@ app.listen(port, '0.0.0.0', () => {
 
 // Setup node cron backup schedule
 var cronJob = cron.schedule("*/5 * * * *", function(){
+    const projectName = config.get('projectName');
     const projectPath = config.get('projectPath');
+    console.log(`[${getDateTime()}] Cron updating ${projectName} at path ${projectPath}`);
     updateRepo(projectPath);
 });
 cronJob.start();

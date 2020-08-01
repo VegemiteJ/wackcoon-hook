@@ -56,7 +56,7 @@ function updateRepo(projectPath, exclusionPattern="")
     // and ditch any files that have been added locally too
     var command ='git -C ' + projectPath + ' clean -xdf';
     if (exclusionPattern !== "") {
-        command = command + ' -e ' + exclusionPattern;
+        command = command + ' ' + exclusionPattern;
         console.log(`[${getDateTime()}] Running clean command: ${command}`);
     }
     exec(command, execCallback);

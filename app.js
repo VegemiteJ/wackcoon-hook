@@ -47,14 +47,19 @@ function execCallback(err, stdout, stderr) {
 }
 
 // Logic to update repo
-function updateRepo(projectPath)
+function updateRepo(projectPath, exclusionPattern="")
 {
     console.log(`[${getDateTime()}] Pulling code from GitHub...`);
     // reset any changes that have been made locally
     exec('git -C ' + projectPath + ' reset --hard', execCallback);
 
     // and ditch any files that have been added locally too
-    exec('git -C ' + projectPath + ' clean -xdf', execCallback);
+    var command ='git -C ' + projectPath + ' clean -xdf';
+    if (exclusionPattern !== "") {
+        command = command + ' -e ' + exclusionPattern;
+        console.log(`[${getDateTime()}] Running clean command: ${command}`);
+    }
+    exec(command, execCallback);
 
     // ensure on master branch
     exec('git -C ' + projectPath + ' checkout master', execCallback);
@@ -85,6 +90,7 @@ app.post('/payload', function (req, res) {
     //  Read on every call so the server doesn't need to restart on config updates
     const projectName = config.get('projectName');
     const projectPath = config.get('projectPath');
+    const exclusionPattern = config.get('exclusionPattern');
     console.log(`[${getDateTime()}] Hook updating ${projectName} at path ${projectPath}`);
     // Verify this is an update for the right repo
     if (req.body.repository.full_name !== projectName) {
@@ -93,7 +99,7 @@ app.post('/payload', function (req, res) {
         return;
     };
 
-    updateRepo(projectPath);
+    updateRepo(projectPath, exclusionPattern);
     res.sendStatus(200);
 });
 
@@ -107,7 +113,8 @@ app.listen(port, '0.0.0.0', () => {
 var cronJob = cron.schedule("*/5 * * * *", function(){
     const projectName = config.get('projectName');
     const projectPath = config.get('projectPath');
+    const exclusionPattern = config.get('exclusionPattern');
     console.log(`[${getDateTime()}] Cron updating ${projectName} at path ${projectPath}`);
-    updateRepo(projectPath);
+    updateRepo(projectPath, exclusionPattern);
 });
 cronJob.start();
